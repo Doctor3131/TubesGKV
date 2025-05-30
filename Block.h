@@ -25,6 +25,8 @@ public:
     }
 
     // Called when the block is destroyed
+    // On break harus komunikasi ke world state 
+    //      -> antara player yang ngirim signal ke world atau block ngirim signal ke world
     virtual void onBreak() {
         std::cout << "Block broken at (" 
                   << position.x << ", "

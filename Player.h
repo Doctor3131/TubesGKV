@@ -58,6 +58,7 @@ public:
         delete blockInWorld;
     }
 
+    // Revisi nanti Unggul akan revisi
     // Cycle inventory index
     void selectNextSlot() {
         inventoryIndex = (inventoryIndex + 1) % INVENTORY_SLOTS;
