@@ -4,7 +4,7 @@ CXXFLAGS = -Wall -std=c++17 -g
 LDFLAGS = -lopengl32 -lglu32 -lfreeglut
 
 # Source and object files
-SRCS = main.cpp Renderer.cpp renderChunks.cpp
+SRCS = main.cpp Renderer.cpp renderChunks.cpp Player.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # Headers (optional: for dependencies)

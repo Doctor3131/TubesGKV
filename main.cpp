@@ -1,21 +1,25 @@
-#include "Vector3.h"
-#include "block.h"
-#include "player.h"
 #include "Renderer.h"
 #include <iostream>
 
-
-
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(800, 600);
-    glutCreateWindow("3D Block Grid");
+    glutCreateWindow("Interactive Scene");
 
-    initBlocks();
     initOpenGL();
+    initBlocks(); // Initialize the block grid
+
+    setPlayerSpawnPosition();
 
     glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
+    glutMotionFunc(mouseMove);
+    glutPassiveMotionFunc(mouseMove);
+
+    // glutTimerFunc(16, updateScene, 0); // ~60 FPS update loop
+
     glutMainLoop();
     return 0;
 }
