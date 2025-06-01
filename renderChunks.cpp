@@ -76,7 +76,28 @@ void drawDoor(const Vector3& pos, const Vector3& size, const BlockTextureSet& te
     glPopMatrix();
 }
 
-
+// ==== FRONT
+void drawFrontTextureOnly(const Vector3& pos, const Vector3& size, GLuint frontTexture) {
+    glPushMatrix();
+    glTranslatef(pos.x, pos.y, pos.z);
+    
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    
+    glBindTexture(GL_TEXTURE_2D, frontTexture);
+    
+    // Hanya render FRONT FACE
+    glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-size.x / 2, -size.y / 2, size.z / 2);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, size.z / 2);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, size.z / 2);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, size.z / 2);
+    glEnd();
+    
+    glPopMatrix();
+}
 
 
 // Update drawCubeWithTextures untuk handle door
@@ -272,8 +293,14 @@ void initBlocks() {
     BlockTextureSet stoneTextures = texManager.getBlockTextures(BlockType::Stone);
     drawCubeWithTextures(stonePos, size, stoneTextures);
 
-     // Stone brick - di bawah kanan
+    // Stone brick - di bawah kanan
     Vector3 quartzPos(-4.0, 2.0f, 1.0f);
     BlockTextureSet quartzTextures = texManager.getBlockTextures(BlockType::Quartz);
     drawCubeWithTextures(quartzPos, size, quartzTextures);
+
+
+    // Flower block - hanya front texture
+    Vector3 bungaPos(-5.0f, 1.0f, 1.0f); // posisi flower
+    GLuint bungaTexture = texManager.loadTexture("textures/flower.png");
+    drawFrontTextureOnly(bungaPos, size, bungaTexture);
 }
