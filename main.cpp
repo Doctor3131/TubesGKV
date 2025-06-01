@@ -17,9 +17,11 @@ int main(int argc, char** argv) {
     glutKeyboardFunc(keyboard);
     glutMotionFunc(mouseMove);
     glutPassiveMotionFunc(mouseMove);
+    
+    // Set fungsi display untuk merender
+    glutDisplayFunc(display);
 
-    // glutTimerFunc(16, updateScene, 0); // ~60 FPS update loop
-
+    glutTimerFunc(16, updateScene, 0); // ~60 FPS update loop
     glutMainLoop();
     return 0;
 }

@@ -1,27 +1,26 @@
 #include "renderChunks.h"
+#include "textureManager.h" 
+#include "loadimage/textureloader.h"
+
+#include "renderChunks.h"
+
 
 Mat3d<std::shared_ptr<Block>> blockGrid(100, 100, 100);
 
-void applyColor(BlockType type) {
-    switch (type) {
-        case BlockType::Grass: glColor3f(0.0f, 1.0f, 0.0f); break;
-        case BlockType::Dirt:  glColor3f(0.5f, 0.25f, 0.0f); break;
-        case BlockType::Stone: glColor3f(0.5f, 0.5f, 0.5f); break;
-        case BlockType::Wood:  glColor3f(0.55f, 0.27f, 0.07f); break;
-        case BlockType::Sand:  glColor3f(0.96f, 0.87f, 0.7f); break;
-    }
+// Helper function untuk set brightness
+void setBrightness(float brightness) {
+    glColor3f(brightness, brightness, brightness);
 }
 
-void drawCube(const Vector3& pos, const Vector3& size, BlockType type) {
-    // std::cout << "Drawing block at: " << pos.x << ", " << pos.y << ", " << pos.z << "\n";
-    applyColor(type);
-    glPushMatrix();
-    glTranslatef(pos.x, pos.y, pos.z);
-    glutSolidCube(size.x);  // Assuming uniform cube
-    glPopMatrix();
+// Legacy function untuk backward compatibility
+void drawCube(const Vector3& pos, const Vector3& size, GLuint textureID) {
+    BlockTextureSet simpleTexture(textureID);
+    drawCubeWithTextures(pos, size, simpleTexture);
 }
 
 void initBlocks() {
+    auto& texManager = TextureManager::getInstance();
+    
     Vector3 size(1.0f, 1.0f, 1.0f);
     srand(static_cast<unsigned>(time(nullptr)));  // For noise offset
 
@@ -53,4 +52,17 @@ void initBlocks() {
     }
 }
 
-
+// Function untuk place door (2 blocks)
+void placeDoor(const Vector3& bottomPos, BlockType doorType) {
+    Vector3 size(1.0f, 1.0f, 1.0f);
+    Vector3 topPos = bottomPos;
+    topPos.y += 1.0f;
+    
+    auto& texManager = TextureManager::getInstance();
+    BlockTextureSet doorTextures = texManager.getBlockTextures(doorType);
+    
+    // Bottom part
+    auto bottomDoor = std::make_shared<Block>(doorType, bottomPos, size, doorTextures, true);
+    // Top part  
+    auto topDoor = std::make_shared<Block>(doorType, topPos, size, doorTextures, false);
+}

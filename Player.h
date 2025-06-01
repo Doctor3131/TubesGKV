@@ -1,8 +1,11 @@
 // Player.h
 #pragma once
 #include "vector3.h"
-#include "Block.h"
+#include "block.h"
+#include "textureManager.h" 
 #include "renderChunks.h"
+#include <array>
+#include <memory>
 #include <iostream>
 #include <GL/glut.h>
 

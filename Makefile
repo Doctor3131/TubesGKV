@@ -4,11 +4,13 @@ CXXFLAGS = -Wall -std=c++17 -g
 LDFLAGS = -lopengl32 -lglu32 -lfreeglut
 
 # Source and object files
-SRCS = main.cpp Renderer.cpp renderChunks.cpp Player.cpp
+SRCS = main.cpp Renderer.cpp renderChunks.cpp Player.cpp \
+       textureManager.cpp loadimage/textureloader.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # Headers (optional: for dependencies)
-HEADERS = Block.h Mat3.h Player.h renderChunks.h Renderer.h Vector3.h
+HEADERS = Block.h Mat3.h Player.h renderChunks.h Renderer.h Vector3.h \
+          textureManager.h loadimage/textureloader.h loadimage/stb_image.h
 
 TARGET = blockgame
 
