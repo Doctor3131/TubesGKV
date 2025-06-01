@@ -20,9 +20,9 @@ enum class BlockType {
     Door,
     Sun,
     Sand,
+    Stone,
 
     Quartz,
-    Stone,
     Flower,
     tumbuhan
     // add more types as needed

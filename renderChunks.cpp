@@ -271,4 +271,9 @@ void initBlocks() {
     Vector3 stonePos(3.0, 5.0f, 1.0f);
     BlockTextureSet stoneTextures = texManager.getBlockTextures(BlockType::Stone);
     drawCubeWithTextures(stonePos, size, stoneTextures);
+
+     // Stone brick - di bawah kanan
+    Vector3 quartzPos(-4.0, 2.0f, 1.0f);
+    BlockTextureSet quartzTextures = texManager.getBlockTextures(BlockType::Quartz);
+    drawCubeWithTextures(quartzPos, size, quartzTextures);
 }

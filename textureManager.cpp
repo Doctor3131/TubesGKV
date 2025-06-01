@@ -78,6 +78,7 @@ void TextureManager::initializeBlockTextures() {
     blockTextureMappings.emplace(BlockType::Crafting_table, BlockTextureSet(crafting_side, crafting_top, wood_side));
     blockTextureMappings.emplace(BlockType::Quartz, BlockTextureSet(quartz_side, quartz_top, quartz_top));
     
+    
     // Special blocks
     blockTextureMappings.emplace(BlockType::Sun, BlockTextureSet(sun));
 
