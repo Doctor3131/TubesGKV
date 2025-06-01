@@ -21,5 +21,9 @@ void mouseMove(int x, int y);
 
 void setPlayerSpawnPosition();
 
+void drawText(float x, float y, const char* text);
+
+void updateFPS();
+
 void display();
 

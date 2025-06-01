@@ -47,8 +47,9 @@ void Player::moveRight(float speed) {
     }
     glutPostRedisplay();
 }
+
 void Player::moveUp(float speed) {
-    velocity.y += speed; // Apply upward velocity for jump
+    position.y += speed; 
     glutPostRedisplay();
 }
 
@@ -82,14 +83,14 @@ void Player::place(const Vector3& target) {
 }
 
 void Player::update(float deltaTime) {
-    float gravity = -9.8f;
-    velocity.y += gravity * deltaTime;
+    // float gravity = -9.8f;
+    // velocity.y += gravity * deltaTime;
     position += velocity * deltaTime;
 
-    if (position.y < 0.0f) {
-        position.y = 0.0f;
-        velocity.y = 0.0f;
-    }
+    // if (position.y < 0.0f) {
+    //     position.y = 0.0f;
+    //     velocity.y = 0.0f;
+    // }
     glutPostRedisplay();
 }
 
