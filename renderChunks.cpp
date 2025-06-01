@@ -1,72 +1,96 @@
 #include "renderChunks.h"
 #include "textureManager.h" 
 #include "loadimage/textureloader.h"
+// ===== UPDATED RENDERCHUNKS.CPP DENGAN MANUAL FACE LIGHTING =====
+const float TOP_BRIGHTNESS = 1.0f;      // Top face paling terang (terkena matahari langsung)
+const float FRONT_BRIGHTNESS = 0.8f;    // Front face terang
+const float BACK_BRIGHTNESS = 0.8f;     // Back face terang  
+const float LEFT_BRIGHTNESS = 0.6f;     // Left face agak gelap
+const float RIGHT_BRIGHTNESS = 0.6f;    // Right face agak gelap
+const float BOTTOM_BRIGHTNESS = 0.5f;   // Bottom face paling gelap
+
 
 Mat3d<std::shared_ptr<Block>> blockGrid(3, 3, 3);
 
 // FIXED: Door rendering function - bikin door tipis kayak Minecraft
+// Update drawDoor function dengan normals
+
+// Helper function untuk set brightness
+void setBrightness(float brightness) {
+    glColor3f(brightness, brightness, brightness);
+}
+
+// UPDATED: drawDoor dengan manual lighting
 void drawDoor(const Vector3& pos, const Vector3& size, const BlockTextureSet& textures, bool isBottomPart) {
     glPushMatrix();
     glTranslatef(pos.x, pos.y, pos.z);
     
     glEnable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
     
-    // Door thickness (tipis kayak Minecraft)
     float doorThickness = 0.1f;
     float halfWidth = size.x / 2.0f;
     float halfHeight = size.y / 2.0f;
     
-    // Pilih texture berdasarkan bottom/top part
     GLuint doorTexture = isBottomPart ? 
         textures.getTexture(BlockFace::BOTTOM) : 
         textures.getTexture(BlockFace::TOP);
     
     glBindTexture(GL_TEXTURE_2D, doorTexture);
     
-    // FRONT FACE (main door face)
+    // FRONT FACE (terang)
+    setBrightness(FRONT_BRIGHTNESS);
     glBegin(GL_QUADS);
+        glNormal3f(0.0f, 0.0f, 1.0f);
         glTexCoord2f(0.0f, 0.0f); glVertex3f(-halfWidth, -halfHeight, doorThickness/2);
         glTexCoord2f(1.0f, 0.0f); glVertex3f(halfWidth, -halfHeight, doorThickness/2);
         glTexCoord2f(1.0f, 1.0f); glVertex3f(halfWidth, halfHeight, doorThickness/2);
         glTexCoord2f(0.0f, 1.0f); glVertex3f(-halfWidth, halfHeight, doorThickness/2);
     glEnd();
     
-    // BACK FACE 
+    // BACK FACE (terang)
+    setBrightness(BACK_BRIGHTNESS);
     glBegin(GL_QUADS);
+        glNormal3f(0.0f, 0.0f, -1.0f);
         glTexCoord2f(1.0f, 0.0f); glVertex3f(-halfWidth, -halfHeight, -doorThickness/2);
         glTexCoord2f(1.0f, 1.0f); glVertex3f(-halfWidth, halfHeight, -doorThickness/2);
         glTexCoord2f(0.0f, 1.0f); glVertex3f(halfWidth, halfHeight, -doorThickness/2);
         glTexCoord2f(0.0f, 0.0f); glVertex3f(halfWidth, -halfHeight, -doorThickness/2);
     glEnd();
     
-    // SIDES (tipis)
-    // Left side
+    // LEFT SIDE (agak gelap)
+    setBrightness(LEFT_BRIGHTNESS);
     glBegin(GL_QUADS);
+        glNormal3f(-1.0f, 0.0f, 0.0f);
         glTexCoord2f(0.0f, 0.0f); glVertex3f(-halfWidth, -halfHeight, -doorThickness/2);
         glTexCoord2f(1.0f, 0.0f); glVertex3f(-halfWidth, -halfHeight, doorThickness/2);
         glTexCoord2f(1.0f, 1.0f); glVertex3f(-halfWidth, halfHeight, doorThickness/2);
         glTexCoord2f(0.0f, 1.0f); glVertex3f(-halfWidth, halfHeight, -doorThickness/2);
     glEnd();
     
-    // Right side
+    // RIGHT SIDE (agak gelap)
+    setBrightness(RIGHT_BRIGHTNESS);
     glBegin(GL_QUADS);
+        glNormal3f(1.0f, 0.0f, 0.0f);
         glTexCoord2f(1.0f, 0.0f); glVertex3f(halfWidth, -halfHeight, -doorThickness/2);
         glTexCoord2f(0.0f, 0.0f); glVertex3f(halfWidth, -halfHeight, doorThickness/2);
         glTexCoord2f(0.0f, 1.0f); glVertex3f(halfWidth, halfHeight, doorThickness/2);
         glTexCoord2f(1.0f, 1.0f); glVertex3f(halfWidth, halfHeight, -doorThickness/2);
     glEnd();
     
-    // TOP (kalau perlu)
+    // TOP (terang)
+    setBrightness(TOP_BRIGHTNESS);
     glBegin(GL_QUADS);
+        glNormal3f(0.0f, 1.0f, 0.0f);
         glTexCoord2f(0.0f, 1.0f); glVertex3f(-halfWidth, halfHeight, -doorThickness/2);
         glTexCoord2f(0.0f, 0.0f); glVertex3f(-halfWidth, halfHeight, doorThickness/2);
         glTexCoord2f(1.0f, 0.0f); glVertex3f(halfWidth, halfHeight, doorThickness/2);
         glTexCoord2f(1.0f, 1.0f); glVertex3f(halfWidth, halfHeight, -doorThickness/2);
     glEnd();
     
-    // BOTTOM (kalau perlu)
+    // BOTTOM (gelap)
+    setBrightness(BOTTOM_BRIGHTNESS);
     glBegin(GL_QUADS);
+        glNormal3f(0.0f, -1.0f, 0.0f);
         glTexCoord2f(1.0f, 1.0f); glVertex3f(-halfWidth, -halfHeight, -doorThickness/2);
         glTexCoord2f(0.0f, 1.0f); glVertex3f(halfWidth, -halfHeight, -doorThickness/2);
         glTexCoord2f(0.0f, 0.0f); glVertex3f(halfWidth, -halfHeight, doorThickness/2);
@@ -77,8 +101,10 @@ void drawDoor(const Vector3& pos, const Vector3& size, const BlockTextureSet& te
 }
 
 
+
 // =========================
 // ==== FRONT
+// UPDATED: drawFrontTextureOnly dengan brightness
 void drawFrontTextureOnly(const Vector3& pos, const Vector3& size, GLuint frontTexture) {
     glPushMatrix();
     glTranslatef(pos.x, pos.y, pos.z);
@@ -86,12 +112,15 @@ void drawFrontTextureOnly(const Vector3& pos, const Vector3& size, GLuint frontT
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    
+    // Set brightness untuk front texture
+    setBrightness(FRONT_BRIGHTNESS);
     
     glBindTexture(GL_TEXTURE_2D, frontTexture);
     
-    // Hanya render FRONT FACE
+    // Hanya render FRONT FACE dengan normal
     glBegin(GL_QUADS);
+        glNormal3f(0.0f, 0.0f, 1.0f);
         glTexCoord2f(0.0f, 0.0f); glVertex3f(-size.x / 2, -size.y / 2, size.z / 2);
         glTexCoord2f(1.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, size.z / 2);
         glTexCoord2f(1.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, size.z / 2);
@@ -103,8 +132,7 @@ void drawFrontTextureOnly(const Vector3& pos, const Vector3& size, GLuint frontT
 
 
 
-
-// Update drawCubeWithTextures untuk handle door
+// UPDATED: drawCubeWithTextures dengan manual lighting
 void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTextureSet& textures, const Block* block) {
     // Special case untuk door
     if (block && block->getType() == BlockType::Door) {
@@ -113,62 +141,18 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
         return;
     }
     
-    // Regular cube rendering untuk block lain
     glPushMatrix();
     glTranslatef(pos.x, pos.y, pos.z);
     
     glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND); // Enable blending per object
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // Pakai glColor4f dengan alpha
+    glEnable(GL_BLEND);
     
-    // FRONT FACE
-    if (!block || block->shouldRenderFace(BlockFace::FRONT)) {
-        glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::FRONT));
-        glBegin(GL_QUADS);
-            glTexCoord2f(0.0f, 0.0f); glVertex3f(-size.x / 2, -size.y / 2, size.z / 2);
-            glTexCoord2f(1.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, size.z / 2);
-            glTexCoord2f(1.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, size.z / 2);
-            glTexCoord2f(0.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, size.z / 2);
-        glEnd();
-    }
-    
-    // BACK FACE
-    if (!block || block->shouldRenderFace(BlockFace::BACK)) {
-        glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::BACK));
-        glBegin(GL_QUADS);
-            glTexCoord2f(1.0f, 0.0f); glVertex3f(-size.x / 2, -size.y / 2, -size.z / 2);
-            glTexCoord2f(1.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, -size.z / 2);
-            glTexCoord2f(0.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, -size.z / 2);
-            glTexCoord2f(0.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, -size.z / 2);
-        glEnd();
-    }
-    
-    // LEFT FACE
-    if (!block || block->shouldRenderFace(BlockFace::LEFT)) {
-        glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::LEFT));
-        glBegin(GL_QUADS);
-            glTexCoord2f(0.0f, 0.0f); glVertex3f(-size.x / 2, -size.y / 2, -size.z / 2);
-            glTexCoord2f(1.0f, 0.0f); glVertex3f(-size.x / 2, -size.y / 2, size.z / 2);
-            glTexCoord2f(1.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, size.z / 2);
-            glTexCoord2f(0.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, -size.z / 2);
-        glEnd();
-    }
-    
-    // RIGHT FACE
-    if (!block || block->shouldRenderFace(BlockFace::RIGHT)) {
-        glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::RIGHT));
-        glBegin(GL_QUADS);
-            glTexCoord2f(1.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, -size.z / 2);
-            glTexCoord2f(0.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, size.z / 2);
-            glTexCoord2f(0.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, size.z / 2);
-            glTexCoord2f(1.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, -size.z / 2);
-        glEnd();
-    }
-    
-    // TOP FACE
+    // TOP FACE (paling terang - terkena matahari langsung)
     if (!block || block->shouldRenderFace(BlockFace::TOP)) {
+        setBrightness(TOP_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::TOP));
         glBegin(GL_QUADS);
+            glNormal3f(0.0f, 1.0f, 0.0f);
             glTexCoord2f(0.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, -size.z / 2);
             glTexCoord2f(0.0f, 0.0f); glVertex3f(-size.x / 2, size.y / 2, size.z / 2);
             glTexCoord2f(1.0f, 0.0f); glVertex3f(size.x / 2, size.y / 2, size.z / 2);
@@ -176,10 +160,64 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
         glEnd();
     }
     
-    // BOTTOM FACE
+    // FRONT FACE (terang - pemain biasanya lihat dari sini)
+    if (!block || block->shouldRenderFace(BlockFace::FRONT)) {
+        setBrightness(FRONT_BRIGHTNESS);
+        glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::FRONT));
+        glBegin(GL_QUADS);
+            glNormal3f(0.0f, 0.0f, 1.0f);
+            glTexCoord2f(0.0f, 0.0f); glVertex3f(-size.x / 2, -size.y / 2, size.z / 2);
+            glTexCoord2f(1.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, size.z / 2);
+            glTexCoord2f(1.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, size.z / 2);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, size.z / 2);
+        glEnd();
+    }
+    
+    // BACK FACE (terang - sama seperti front)
+    if (!block || block->shouldRenderFace(BlockFace::BACK)) {
+        setBrightness(BACK_BRIGHTNESS);
+        glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::BACK));
+        glBegin(GL_QUADS);
+            glNormal3f(0.0f, 0.0f, -1.0f);
+            glTexCoord2f(1.0f, 0.0f); glVertex3f(-size.x / 2, -size.y / 2, -size.z / 2);
+            glTexCoord2f(1.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, -size.z / 2);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, -size.z / 2);
+            glTexCoord2f(0.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, -size.z / 2);
+        glEnd();
+    }
+    
+    // LEFT FACE (agak gelap - side lighting)
+    if (!block || block->shouldRenderFace(BlockFace::LEFT)) {
+        setBrightness(LEFT_BRIGHTNESS);
+        glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::LEFT));
+        glBegin(GL_QUADS);
+            glNormal3f(-1.0f, 0.0f, 0.0f);
+            glTexCoord2f(0.0f, 0.0f); glVertex3f(-size.x / 2, -size.y / 2, -size.z / 2);
+            glTexCoord2f(1.0f, 0.0f); glVertex3f(-size.x / 2, -size.y / 2, size.z / 2);
+            glTexCoord2f(1.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, size.z / 2);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, -size.z / 2);
+        glEnd();
+    }
+    
+    // RIGHT FACE (agak gelap - side lighting)
+    if (!block || block->shouldRenderFace(BlockFace::RIGHT)) {
+        setBrightness(RIGHT_BRIGHTNESS);
+        glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::RIGHT));
+        glBegin(GL_QUADS);
+            glNormal3f(1.0f, 0.0f, 0.0f);
+            glTexCoord2f(1.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, -size.z / 2);
+            glTexCoord2f(0.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, size.z / 2);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, size.z / 2);
+            glTexCoord2f(1.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, -size.z / 2);
+        glEnd();
+    }
+    
+    // BOTTOM FACE (paling gelap - tidak terkena cahaya)
     if (!block || block->shouldRenderFace(BlockFace::BOTTOM)) {
+        setBrightness(BOTTOM_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::BOTTOM));
         glBegin(GL_QUADS);
+            glNormal3f(0.0f, -1.0f, 0.0f);
             glTexCoord2f(1.0f, 1.0f); glVertex3f(-size.x / 2, -size.y / 2, -size.z / 2);
             glTexCoord2f(0.0f, 1.0f); glVertex3f(size.x / 2, -size.y / 2, -size.z / 2);
             glTexCoord2f(0.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, size.z / 2);
@@ -191,11 +229,14 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
 }
 
 
+
+
 // Legacy function untuk backward compatibility
 void drawCube(const Vector3& pos, const Vector3& size, GLuint textureID) {
     BlockTextureSet simpleTexture(textureID);
     drawCubeWithTextures(pos, size, simpleTexture);
 }
+
 
 // Function untuk place door (2 blocks)
 void placeDoor(const Vector3& bottomPos, BlockType doorType) {
@@ -211,6 +252,7 @@ void placeDoor(const Vector3& bottomPos, BlockType doorType) {
     // Top part  
     auto topDoor = std::make_shared<Block>(doorType, topPos, size, doorTextures, false);
 }
+
 
 void initBlocks() {
     auto& texManager = TextureManager::getInstance();

@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "renderChunks.h"
-
+void setupLighting();
 void initOpenGL();
 void display();
 
