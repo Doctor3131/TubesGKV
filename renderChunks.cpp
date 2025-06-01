@@ -192,28 +192,80 @@ void placeDoor(const Vector3& bottomPos, BlockType doorType) {
 }
 
 void initBlocks() {
-    // Initialize texture manager
     auto& texManager = TextureManager::getInstance();
-    texManager.initializeBlockTextures();
-
     Vector3 size(1.0f, 1.0f, 1.0f);
     
-    // Example: Create different block types
-    // Grass block
-    Vector3 grassPos(0.0f, 0.0f, 0.0f);
+    // Grass block - langsung render
+    Vector3 grassPos(-3.0f, 0.0f, 0.0f);
     BlockTextureSet grassTextures = texManager.getBlockTextures(BlockType::Grass);
-    auto grassBlock = std::make_shared<Block>(BlockType::Grass, grassPos, size, grassTextures);
-    blockGrid.at(0, 0, 0) = grassBlock;
+    drawCubeWithTextures(grassPos, size, grassTextures);
     
-    // Wood block
-    Vector3 woodPos(2.0f, 0.0f, 0.0f);
+    // Wood block - langsung render
+    Vector3 woodPos(-3.0f, 2.0f, 0.0f);
     BlockTextureSet woodTextures = texManager.getBlockTextures(BlockType::Wood);
-    auto woodBlock = std::make_shared<Block>(BlockType::Wood, woodPos, size, woodTextures);
-    blockGrid.at(1, 0, 0) = woodBlock;
+    drawCubeWithTextures(woodPos, size, woodTextures);
     
-    // Crafting table
-    Vector3 craftPos(4.0f, 0.0f, 0.0f);
+    // Crafting table - langsung render
+    Vector3 craftPos(-3.0f, 4.0f, 0.0f);
     BlockTextureSet craftTextures = texManager.getBlockTextures(BlockType::Crafting_table);
-    auto craftBlock = std::make_shared<Block>(BlockType::Crafting_table, craftPos, size, craftTextures);
-    blockGrid.at(2, 0, 0) = craftBlock;
+    drawCubeWithTextures(craftPos, size, craftTextures);
+    
+    // Door - langsung render
+    Vector3 doorBottomPos(3.0f, 0.0f, 0.0f);
+    Vector3 doorTopPos(3.0f, 1.0f, 0.0f);
+    BlockTextureSet doorTextures = texManager.getBlockTextures(BlockType::Door);
+    
+    Block doorBottom(BlockType::Door, doorBottomPos, size, doorTextures, true);
+    Block doorTop(BlockType::Door, doorTopPos, size, doorTextures, false);
+    drawCubeWithTextures(doorBottomPos, size, doorTextures, &doorBottom);
+    drawCubeWithTextures(doorTopPos, size, doorTextures, &doorTop);
+    
+    // Sun block - langsung render
+    Vector3 sunPos(0.0f, 6.0f, 0.0f);
+    BlockTextureSet sunTextures = texManager.getBlockTextures(BlockType::Sun);
+    Block sunBlock(BlockType::Sun, sunPos, size, sunTextures);
+    drawCubeWithTextures(sunPos, size, sunTextures, &sunBlock);
+
+     // OBJEK BARU - di samping pintu
+    float doorX = 3.0f; // posisi X pintu
+    
+    // Berry - di kiri pintu
+    Vector3 berryPos(doorX - 2.0f, 0.0f, 0.0f);
+    BlockTextureSet berryTextures = texManager.getBlockTextures(BlockType::Berry);
+    drawCubeWithTextures(berryPos, size, berryTextures);
+    
+    // Bookshelf - di kanan pintu
+    Vector3 bookshelfPos(doorX + 2.0f, 0.0f, 0.0f);
+    BlockTextureSet bookshelfTextures = texManager.getBlockTextures(BlockType::Bookshelf);
+    drawCubeWithTextures(bookshelfPos, size, bookshelfTextures);
+    
+    // Dirt - di belakang pintu
+    Vector3 dirtPos(doorX, 0.0f, -2.0f);
+    BlockTextureSet dirtTextures = texManager.getBlockTextures(BlockType::Dirt);
+    drawCubeWithTextures(dirtPos, size, dirtTextures);
+    
+    // Flower leaves - di depan pintu
+    Vector3 flowerPos(doorX, 0.0f, 2.0f);
+    BlockTextureSet flowerTextures = texManager.getBlockTextures(BlockType::Flower_leaves);
+    drawCubeWithTextures(flowerPos, size, flowerTextures);
+    
+    // Ice - di atas kiri pintu
+    Vector3 icePos(doorX - 1.0f, 2.0f, 0.0f);
+    BlockTextureSet iceTextures = texManager.getBlockTextures(BlockType::Ice);
+    drawCubeWithTextures(icePos, size, iceTextures);
+    
+    // Leaves - di atas kanan pintu
+    Vector3 leavesPos(doorX + 1.0f, 2.0f, 0.0f);
+    BlockTextureSet leavesTextures = texManager.getBlockTextures(BlockType::Leaves);
+    drawCubeWithTextures(leavesPos, size, leavesTextures);
+    
+    // Sand - di bawah kiri
+    Vector3 sandPos(doorX - 1.0f, -1.0f, 0.0f);
+    BlockTextureSet sandTextures = texManager.getBlockTextures(BlockType::Sand);
+    drawCubeWithTextures(sandPos, size, sandTextures);
+    
+    // Stone brick - di bawah kanan
+    Vector3 stoneBrickPos(doorX + 1.0f, -1.0f, 0.0f);
+    BlockTextureSet stoneBrickTextures = texManager.getBlockTextures(BlockType::Stone_bricks);
+    drawCubeWithTextures(stoneBrickPos, size, stoneBrickTextures);
 }
