@@ -204,6 +204,7 @@ void initOpenGL() {
     // ==========================================
 
     glCullFace(GL_BACK);
+    glDisable(GL_CULL_FACE);
     glFrontFace(GL_CCW);    // Only this line, no glFrontFace(GL_CW);    
     // Setup lighting 
     setupLighting();
@@ -266,7 +267,7 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
     }
     
     // FRONT FACE (terang - pemain biasanya lihat dari sini)
-    if (!block || block->shouldRenderFace(BlockFace::FRONT)) {
+    if (!block || block->shouldRenderFace(BlockFace::FRONT) || true) {
         setBrightness(FRONT_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::FRONT));
         glBegin(GL_QUADS);
@@ -279,7 +280,7 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
     }
     
     // BACK FACE (terang - sama seperti front)
-    if (!block || block->shouldRenderFace(BlockFace::BACK)) {
+    if (!block || block->shouldRenderFace(BlockFace::BACK ) || true) {
         setBrightness(BACK_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::BACK));
         glBegin(GL_QUADS);
@@ -292,7 +293,7 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
     }
     
     // LEFT FACE (agak gelap - side lighting)
-    if (!block || block->shouldRenderFace(BlockFace::LEFT)) {
+    if (!block || block->shouldRenderFace(BlockFace::LEFT) || true) {
         setBrightness(LEFT_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::LEFT));
         glBegin(GL_QUADS);
@@ -305,7 +306,7 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
     }
     
     // RIGHT FACE (agak gelap - side lighting)
-    if (!block || block->shouldRenderFace(BlockFace::RIGHT)) {
+    if (!block || block->shouldRenderFace(BlockFace::RIGHT) || true) {
         setBrightness(RIGHT_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::RIGHT));
         glBegin(GL_QUADS);
@@ -362,7 +363,17 @@ void display() {
                 auto block = blockGrid.at(z, y, x);
                 const Block* rawPtr = block.get();
                 if (block) {
-                    drawCubeWithTextures(block->getPosition(), block->getSize(), block->getTextures() , rawPtr);
+                    bool covered = 
+                        blockGrid.at(z, (y + 1) % 100, x) &&  // top
+                        blockGrid.at(z, (y - 1) % 100, x) &&  // bottom
+                        blockGrid.at(z, y, (x + 1) % 100) &&  // right
+                        blockGrid.at(z, y, (x - 1) % 100) &&  // left
+                        blockGrid.at((z + 1) % 100, y, x) &&  // front
+                        blockGrid.at((z - 1) % 100, y, x);    // back
+
+                    if (!covered) {
+                        drawCubeWithTextures(block->getPosition(), block->getSize(), block->getTextures(), rawPtr);
+                    }
                 }
             }
         }
