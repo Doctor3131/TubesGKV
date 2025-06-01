@@ -363,6 +363,7 @@ void display() {
                 auto block = blockGrid.at(z, y, x);
                 const Block* rawPtr = block.get();
                 if (block) {
+                    // Temp Solution ideally we should do face culling
                     bool covered = 
                         blockGrid.at(z, (y + 1) % 100, x) &&  // top
                         blockGrid.at(z, (y - 1) % 100, x) &&  // bottom
