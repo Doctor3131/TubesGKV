@@ -1,5 +1,6 @@
 #pragma once
-#include <glad/glad.h>
+// #include <glad/glad.h>
+#include <GL/glut.h>
 #include "Vector3.h"
 #include <iostream>
 #include <unordered_map>

@@ -1,7 +1,7 @@
 #ifndef TEXTURELOADER_H
 #define TEXTURELOADER_H
 
-#include <glad/glad.h>
+// #include <glad/glad.h>
 #include <string>
 
 // Fungsi untuk memuat tekstur dari file gambar

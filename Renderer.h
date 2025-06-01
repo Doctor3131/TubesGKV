@@ -1,7 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include <glad/glad.h>     // Harus di-include duluan
+// #include <glad/glad.h>     // Harus di-include duluan
 #include <GL/glut.h>       // Setelah glad
 
 #include <memory>
