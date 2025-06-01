@@ -78,7 +78,7 @@ void TextureManager::initializeBlockTextures() {
     blockTextureMappings.emplace(BlockType::Quartz, BlockTextureSet(quartz_side, quartz_top, quartz_top));
     
     // Special blocks
-    blockTextureMappings.emplace(BlockType::Sun, BlockTextureSet(sun, sun, sun, sun, sun, sun));
+    blockTextureMappings.emplace(BlockType::Sun, BlockTextureSet(sun));
 
     // Special blocks - Door dengan texture yang benar
     blockTextureMappings.emplace(BlockType::Door, BlockTextureSet(door_bottom, door_bottom, door_bottom, door_bottom, door_top, door_bottom));

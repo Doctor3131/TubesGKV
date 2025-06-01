@@ -125,9 +125,6 @@ public:
 
     // Update shouldRenderFace di Block.h
     bool shouldRenderFace(BlockFace face) const {
-        if (type == BlockType::Sun) {
-            return face == BlockFace::BOTTOM; // Sun cuma render bottom
-        }
         return true; // Normal block render semua face
     }
 

@@ -186,10 +186,6 @@ void placeDoor(const Vector3& bottomPos, BlockType doorType) {
     auto bottomDoor = std::make_shared<Block>(doorType, bottomPos, size, doorTextures, true);
     // Top part  
     auto topDoor = std::make_shared<Block>(doorType, topPos, size, doorTextures, false);
-    
-    // Add to grid (assuming we can place at these positions)
-    // blockGrid.at(x, y, z) = bottomDoor;
-    // blockGrid.at(x, y+1, z) = topDoor;
 }
 
 void initBlocks() {
@@ -211,6 +207,12 @@ void initBlocks() {
     BlockTextureSet craftTextures = texManager.getBlockTextures(BlockType::Crafting_table);
     drawCubeWithTextures(craftPos, size, craftTextures);
     
+    // Sun block - langsung render
+    Vector3 sunPos(0.0f, 6.0f, 0.0f);
+    BlockTextureSet sunTextures = texManager.getBlockTextures(BlockType::Sun);
+    drawCubeWithTextures(sunPos, size, sunTextures);
+
+
     // Door - langsung render
     Vector3 doorBottomPos(3.0f, 0.0f, 0.0f);
     Vector3 doorTopPos(3.0f, 1.0f, 0.0f);
@@ -221,11 +223,6 @@ void initBlocks() {
     drawCubeWithTextures(doorBottomPos, size, doorTextures, &doorBottom);
     drawCubeWithTextures(doorTopPos, size, doorTextures, &doorTop);
     
-    // Sun block - langsung render
-    Vector3 sunPos(0.0f, 6.0f, 0.0f);
-    BlockTextureSet sunTextures = texManager.getBlockTextures(BlockType::Sun);
-    Block sunBlock(BlockType::Sun, sunPos, size, sunTextures);
-    drawCubeWithTextures(sunPos, size, sunTextures, &sunBlock);
 
      // OBJEK BARU - di samping pintu
     float doorX = 3.0f; // posisi X pintu
