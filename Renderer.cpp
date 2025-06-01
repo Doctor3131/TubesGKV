@@ -360,10 +360,9 @@ void display() {
         for (size_t y = 0; y < std::min(blockGrid.rows(), size_t(50)); ++y) {
             for (size_t x = 0; x < std::min(blockGrid.cols(), size_t(50)); ++x) {
                 auto block = blockGrid.at(z, y, x);
-                BlockTextureSet texture = texManager.getBlockTextures(block->getType());
                 const Block* rawPtr = block.get();
                 if (block) {
-                    drawCubeWithTextures(block->getPosition(), block->getSize(), texture, rawPtr);
+                    drawCubeWithTextures(block->getPosition(), block->getSize(), block->getTextures() , rawPtr);
                 }
             }
         }
@@ -383,4 +382,14 @@ void display() {
     // glutSolidCube(1.0f);
     glPopMatrix();
     glutSwapBuffers();
+}
+
+void mouseMove(int x, int y) {
+    if (lastMouseX != -1 && lastMouseY != -1) {
+        float deltaX = x - lastMouseX;
+        float deltaY = y - lastMouseY;
+        player.look(deltaX, deltaY);
+    }
+    lastMouseX = x;
+    lastMouseY = y;
 }

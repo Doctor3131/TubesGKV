@@ -61,6 +61,7 @@ void Player::moveDown(float speed) {
 void Player::place(const Vector3& target) {
     Vector3 blockSize(1.0f, 1.0f, 1.0f);
     BlockType blockType = BlockType::Wood;
+    auto& texManager = TextureManager::getInstance();
 
     int bx = static_cast<int>(round(target.x));
     int by = static_cast<int>(round(target.y));
@@ -71,7 +72,8 @@ void Player::place(const Vector3& target) {
         bx >= 0 && bx < blockGrid.cols()) {
         if (!blockGrid.at(bz, by, bx)) {
             Vector3 blockPos(static_cast<float>(bx), static_cast<float>(by), static_cast<float>(bz));
-            blockGrid.at(bz, by, bx) = std::make_shared<Block>(blockType, blockPos, blockSize);
+            BlockTextureSet btexture = texManager.getBlockTextures(blockType);
+            blockGrid.at(bz, by, bx) = std::make_shared<Block>(blockType, blockPos, blockSize, btexture);
             std::cout << "Placed block at (" << bx << ", " << by << ", " << bz << ")\n";
             glutPostRedisplay();
         } else {

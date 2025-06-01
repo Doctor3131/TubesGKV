@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Binary and object files
 blockgame
 *.o
@@ -13,19 +12,3 @@ blockgame
 .vscode/
 .DS_Store
 Thumbs.db
-=======
-# Binary and object files
-blockgame
-*.o
-
-# Backup and temporary files
-*~
-*.swp
-*.tmp
-*.bak
-
-# IDEs and OS files
-.vscode/
-.DS_Store
-Thumbs.db
->>>>>>> main

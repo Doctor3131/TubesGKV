@@ -12,12 +12,6 @@ void setBrightness(float brightness) {
     glColor3f(brightness, brightness, brightness);
 }
 
-// Legacy function untuk backward compatibility
-void drawCube(const Vector3& pos, const Vector3& size, GLuint textureID) {
-    BlockTextureSet simpleTexture(textureID);
-    drawCubeWithTextures(pos, size, simpleTexture);
-}
-
 void initBlocks() {
     auto& texManager = TextureManager::getInstance();
     
@@ -46,7 +40,8 @@ void initBlocks() {
                     type = BlockType::Stone;
                 }
 
-                blockGrid.at(z, y, x) = std::make_shared<Block>(type, pos, size);
+                BlockTextureSet quartzTextures = texManager.getBlockTextures(type);
+                blockGrid.at(z, y, x) = std::make_shared<Block>(type, pos, size, quartzTextures);
             }
         }
     }
