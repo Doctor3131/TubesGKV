@@ -238,12 +238,12 @@ void initBlocks() {
     drawCubeWithTextures(bookshelfPos, size, bookshelfTextures);
     
     // Dirt - di belakang pintu
-    Vector3 dirtPos(doorX, 0.0f, -2.0f);
+    Vector3 dirtPos(3.0f, 3.0f, -2.0f);
     BlockTextureSet dirtTextures = texManager.getBlockTextures(BlockType::Dirt);
     drawCubeWithTextures(dirtPos, size, dirtTextures);
     
     // Flower leaves - di depan pintu
-    Vector3 flowerPos(doorX, 0.0f, 2.0f);
+    Vector3 flowerPos(1.0f, 3.0f, 1.0f);
     BlockTextureSet flowerTextures = texManager.getBlockTextures(BlockType::Flower_leaves);
     drawCubeWithTextures(flowerPos, size, flowerTextures);
     
@@ -266,4 +266,9 @@ void initBlocks() {
     Vector3 stoneBrickPos(doorX + 1.0f, -1.0f, 0.0f);
     BlockTextureSet stoneBrickTextures = texManager.getBlockTextures(BlockType::Stone_bricks);
     drawCubeWithTextures(stoneBrickPos, size, stoneBrickTextures);
+
+    // Stone brick - di bawah kanan
+    Vector3 stonePos(3.0, 5.0f, 1.0f);
+    BlockTextureSet stoneTextures = texManager.getBlockTextures(BlockType::Stone);
+    drawCubeWithTextures(stonePos, size, stoneTextures);
 }

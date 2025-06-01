@@ -9,21 +9,22 @@
 enum class BlockType {
     Grass,
     Dirt,
-    Stone,
     Wood,
-    Sand,
     Berry,
     Bookshelf,
     Flower_leaves,
-    Flower,
     Leaves,
-    Quartz,
     Stone_bricks,
-    tumbuhan,
     Crafting_table,
     Ice,
     Door,
-    Sun
+    Sun,
+    Sand,
+
+    Quartz,
+    Stone,
+    Flower,
+    tumbuhan
     // add more types as needed
 };
 

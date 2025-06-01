@@ -56,6 +56,7 @@ void TextureManager::initializeBlockTextures() {
     GLuint ice = loadTexture("textures/ice.png");
     GLuint leaves = loadTexture("textures/leaves.png");
     GLuint stone_bricks = loadTexture("textures/stone_bricks.png");
+    GLuint sand = loadTexture("textures/stone_bricks.png");
 
     // Simple blocks (same texture all sides) - GUNAKAN EMPLACE
     // TAMBAH MAPPING BARU (simple blocks - texture sama semua sisi)
@@ -69,7 +70,7 @@ void TextureManager::initializeBlockTextures() {
 
     blockTextureMappings.emplace(BlockType::Dirt, BlockTextureSet(dirt));
     blockTextureMappings.emplace(BlockType::Stone, BlockTextureSet(stone));
-    blockTextureMappings.emplace(BlockType::Sand, BlockTextureSet(loadTexture("textures/sand.png")));
+    blockTextureMappings.emplace(BlockType::Sand, BlockTextureSet(sand));
     
     // Complex blocks (different textures per side)
     blockTextureMappings.emplace(BlockType::Grass, BlockTextureSet(grass_side, grass_top, dirt));
