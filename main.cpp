@@ -14,19 +14,25 @@ int main(int argc, char** argv) {
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(800, 600);
     glutCreateWindow("3D Block Grid");
-
+    
     // Inisialisasi GLAD untuk memuat fungsi OpenGL
     if (!gladLoadGLLoader((GLADloadproc)glutGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD!" << std::endl;
-        return -1;  // Jika gagal, hentikan program
+        return -1;
     }
-
     std::cout << "GLAD initialized successfully!" << std::endl;
-
+    
     // Inisialisasi blok dan OpenGL
     initBlocks();
     initOpenGL();
-
+    
+    // ===== TAMBAHKAN INI UNTUK TRANSPARANSI =====
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.1f);
+    // ==========================================
+    
     // Set fungsi display untuk merender
     glutDisplayFunc(display);
     glutMainLoop();

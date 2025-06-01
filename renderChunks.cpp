@@ -93,7 +93,8 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
     glTranslatef(pos.x, pos.y, pos.z);
     
     glEnable(GL_TEXTURE_2D);
-    glColor3f(1.0f, 1.0f, 1.0f);
+    glEnable(GL_BLEND); // Enable blending per object
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // Pakai glColor4f dengan alpha
     
     // FRONT FACE
     if (!block || block->shouldRenderFace(BlockFace::FRONT)) {
