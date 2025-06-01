@@ -5,7 +5,7 @@ CXXFLAGS = -Wall -std=c++17 -g \
     -Iloadimage
 
 LDFLAGS = -L/ucrt64/lib -L/dll/copasFolder/dependencies/lib \
-          -lglfw3 -lopengl32 -lglu32 -lfreeglut  # Hapus -lglad karena pakai glad.o langsung
+          -lglfw3 -lopengl32 -lglu32 -lfreeglut
 
 HEADERS = \
     Block.h \
@@ -13,17 +13,20 @@ HEADERS = \
     Player.h \
     renderChunks.h \
     Renderer.h \
+    textureManager.h \
+    Vector3.h \
     loadimage/textureloader.h
 
 SRCS = \
     main.cpp \
     Renderer.cpp \
     renderChunks.cpp \
+    textureManager.cpp \
     loadimage/textureloader.cpp \
-    dll/copasFolder/glad.c  # glad.c tetap di sini
+    dll/copasFolder/glad.c
 
 OBJS = $(SRCS:.cpp=.o)
-OBJS := $(OBJS:.c=.o)  # Konversi glad.c → glad.o
+OBJS := $(OBJS:.c=.o)
 
 TARGET = blockgame
 
