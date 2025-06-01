@@ -76,6 +76,8 @@ void drawDoor(const Vector3& pos, const Vector3& size, const BlockTextureSet& te
     glPopMatrix();
 }
 
+
+// =========================
 // ==== FRONT
 void drawFrontTextureOnly(const Vector3& pos, const Vector3& size, GLuint frontTexture) {
     glPushMatrix();
@@ -98,6 +100,8 @@ void drawFrontTextureOnly(const Vector3& pos, const Vector3& size, GLuint frontT
     
     glPopMatrix();
 }
+
+
 
 
 // Update drawCubeWithTextures untuk handle door
@@ -185,7 +189,6 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
     
     glPopMatrix();
 }
-
 
 
 // Legacy function untuk backward compatibility
@@ -309,4 +312,11 @@ void initBlocks() {
     Vector3 tumbuhanPos(0.0f, 1.0f, 1.0f); // posisi flower
     GLuint tumbuhanTexture = texManager.loadTexture("textures/tumbuhan.png");
     drawFrontTextureOnly(tumbuhanPos, size, tumbuhanTexture);
+
+
+    // Torch block
+    Vector3 torchPos(-3.0f, 1.0f, 1.0f); // posisi flower
+    GLuint torchTexture = texManager.loadTexture("textures/torc.png");
+    drawFrontTextureOnly(torchPos, size, torchTexture);
+
 }

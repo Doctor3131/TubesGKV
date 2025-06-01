@@ -23,7 +23,8 @@ enum class BlockType {
     Stone,
     Quartz,
     Flower,
-    Tumbuhan
+    Tumbuhan,
+    Torch
     // add more types as needed
 };
 

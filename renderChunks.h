@@ -9,7 +9,6 @@
 extern Mat3d<std::shared_ptr<Block>> blockGrid;
 
 // Deklarasi fungsi yang sudah ada
-
 void drawDoor(const Vector3& pos, const Vector3& size, const BlockTextureSet& textures, bool isBottomPart);
 void drawFrontTextureOnly(const Vector3& pos, const Vector3& size, GLuint frontTexture);
 void drawCube(const Vector3& pos, const Vector3& size, GLuint textureID);
