@@ -1,40 +1,14 @@
 #pragma once
-<<<<<<< HEAD
-#include "vector3.h"
-#include <iostream>
-=======
 #include <glad/glad.h>
 #include "Vector3.h"
 #include <iostream>
 #include <unordered_map>
 #include <string>
->>>>>>> ren
 
 // Define block types with textures
 enum class BlockType {
     Grass,
     Dirt,
-<<<<<<< HEAD
-    Stone,
-    Wood,
-    Sand,
-    // add more types as needed
-};
-
-class Block {
-public:
-    // Constructors & Destructor
-    Block(BlockType type, const Vector3& pos, const Vector3& size)
-        : type(type), position(pos), size(size) {
-        // load texture based on type
-    }
-
-    virtual ~Block() {
-        // cleanup if needed
-    }
-
-    // Called when the block is destroyed
-=======
     Wood,
     Berry,
     Bookshelf,
@@ -126,28 +100,19 @@ public:
     // Called when the block is destroyed
     // On break harus komunikasi ke world state 
     //      -> antara player yang ngirim signal ke world atau block ngirim signal ke world
->>>>>>> ren
     virtual void onBreak() {
         std::cout << "Block broken at (" 
                   << position.x << ", "
                   << position.y << ", "
                   << position.z << ")\n";
-<<<<<<< HEAD
-        // drop item or update world state
-    }
-
-=======
         // Drop item or update world state
     }
 
 
->>>>>>> ren
     // Accessors
     BlockType getType() const { return type; }
     const Vector3& getPosition() const { return position; }
     const Vector3& getSize() const { return size; }
-<<<<<<< HEAD
-=======
     const BlockTextureSet& getTextures() const { return textures; }
 
     bool isMultiBlockType() const { return isMultiBlock; }
@@ -163,17 +128,13 @@ public:
     bool shouldRenderFace(BlockFace face) const {
         return true; // Normal block render semua face
     }
->>>>>>> ren
 
 protected:
     BlockType type;
     Vector3 position;
     Vector3 size;
-<<<<<<< HEAD
-=======
     GLuint textureID;
     BlockTextureSet textures;
     bool isMultiBlock = false;
     bool isBottomPart = true;
->>>>>>> ren
 };
