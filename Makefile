@@ -1,10 +1,9 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++17 -g \
-    -I/ucrt64/include \
     -Idll/copasFolder/dependencies/include \
     -Iloadimage
 
-LDFLAGS = -L/ucrt64/lib -L/dll/copasFolder/dependencies/lib \
+LDFLAGS = -L/dll/copasFolder/dependencies/lib \
           -lglfw3 -lopengl32 -lglu32 -lfreeglut
 
 HEADERS = \
