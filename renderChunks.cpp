@@ -303,4 +303,10 @@ void initBlocks() {
     Vector3 bungaPos(-5.0f, 1.0f, 1.0f); // posisi flower
     GLuint bungaTexture = texManager.loadTexture("textures/flower.png");
     drawFrontTextureOnly(bungaPos, size, bungaTexture);
+
+
+    // Flower block - hanya front texture
+    Vector3 tumbuhanPos(0.0f, 1.0f, 1.0f); // posisi flower
+    GLuint tumbuhanTexture = texManager.loadTexture("textures/tumbuhan.png");
+    drawFrontTextureOnly(tumbuhanPos, size, tumbuhanTexture);
 }

@@ -22,9 +22,8 @@ enum class BlockType {
     Sand,
     Stone,
     Quartz,
-    
     Flower,
-    tumbuhan
+    Tumbuhan
     // add more types as needed
 };
 
