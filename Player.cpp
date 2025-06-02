@@ -176,90 +176,29 @@ void Player::look(float deltaX, float deltaY) {
 }
 
 Vector3 Player::getClickedGroundCoordinate(int mouseX, int mouseY, int windowWidth, int windowHeight) {
-    // Get matrices and viewport
-    GLdouble modelview[16], projection[16];
-    GLint viewport[4];
-    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-    glGetDoublev(GL_PROJECTION_MATRIX, projection);
-    glGetIntegerv(GL_VIEWPORT, viewport);
+    Vector3 origin = this->position;
+    Vector3 dir = this->lookDirection;
+    const float stepSize = 0.05f;
+    const float maxDist = 5.0f;
 
-    // Convert mouse to OpenGL viewport coordinates (origin bottom-left)
-    GLfloat winX = static_cast<GLfloat>(mouseX);
-    GLfloat winY = static_cast<GLfloat>(viewport[3] - mouseY);
+    for (float t = 0; t < maxDist; t += stepSize) {
+        Vector3 pos = origin + dir * t;
 
-    GLdouble nearX, nearY, nearZ;
-    GLdouble farX, farY, farZ;
+        int bx = static_cast<int>(floor(pos.x));
+        int by = static_cast<int>(floor(pos.y));
+        int bz = static_cast<int>(floor(pos.z));
 
-    gluUnProject(winX, winY, 0.0, modelview, projection, viewport, &nearX, &nearY, &nearZ);
-    gluUnProject(winX, winY, 1.0, modelview, projection, viewport, &farX, &farY, &farZ);
+        // std::cout << "Checking block at: (" << bx << ", " << by << ", " << bz << ")\n";
 
-    Vector3 rayOrigin(nearX, nearY, nearZ);
-    Vector3 rayDir = Vector3(farX - nearX, farY - nearY, farZ - nearZ).normalized();
+        if (bx < 0 || by < 0 || bz < 0 || bx >= blockGrid.cols() || by >= blockGrid.rows() || bz >= blockGrid.depth())
+            continue;
 
-    float closestT = std::numeric_limits<float>::max();
-    Vector3 closestBlockPos(-1, -1, -1);
-
-    auto RayIntersectsBox = [](const Vector3& rayOrig, const Vector3& rayDir,
-                               const Vector3& boxMin, const Vector3& boxMax,
-                               float& tNear) -> bool {
-        float tmin = (boxMin.x - rayOrig.x) / rayDir.x;
-        float tmax = (boxMax.x - rayOrig.x) / rayDir.x;
-        if (tmin > tmax) std::swap(tmin, tmax);
-
-        float tymin = (boxMin.y - rayOrig.y) / rayDir.y;
-        float tymax = (boxMax.y - rayOrig.y) / rayDir.y;
-        if (tymin > tymax) std::swap(tymin, tymax);
-
-        if ((tmin > tymax) || (tymin > tmax))
-            return false;
-
-        if (tymin > tmin)
-            tmin = tymin;
-        if (tymax < tmax)
-            tmax = tymax;
-
-        float tzmin = (boxMin.z - rayOrig.z) / rayDir.z;
-        float tzmax = (boxMax.z - rayOrig.z) / rayDir.z;
-        if (tzmin > tzmax) std::swap(tzmin, tzmax);
-
-        if ((tmin > tzmax) || (tzmin > tmax))
-            return false;
-
-        if (tzmin > tmin)
-            tmin = tzmin;
-        if (tzmax < tmax)
-            tmax = tzmax;
-
-        if (tmax < 0)
-            return false;
-
-        tNear = tmin >= 0 ? tmin : tmax;
-        return true;
-    };
-
-    for (int z = 0; z < blockGrid.depth(); ++z) {
-        for (int y = 0; y < blockGrid.rows(); ++y) {
-            for (int x = 0; x < blockGrid.cols(); ++x) {
-                if (!blockGrid.at(z, y, x)) continue;  // no block here
-
-                Vector3 boxMin(x, y, z);
-                Vector3 boxMax(x + 1.0f, y + 1.0f, z + 1.0f);
-
-                float tNear;
-                if (RayIntersectsBox(rayOrigin, rayDir, boxMin, boxMax, tNear)) {
-                    if (tNear < closestT) {
-                        closestT = tNear;
-                        closestBlockPos = Vector3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
-                    }
-                }
-            }
+        if (blockGrid.at(bz, by, bx)) {
+            std::cout << "✅ Hit block at: (" << bx << ", " << by << ", " << bz << ")\n";
+            return Vector3(bx, by, bz);
         }
     }
+    // std::cout << "❌ No block hit.\n";
+    return Vector3(-1, -1, -1);
 
-    if (closestBlockPos.x == -1 && closestBlockPos.y == -1 && closestBlockPos.z == -1) {
-        return Vector3(-1, -1, -1);
-    }
-
-    std::cout << "Player clicked block at: (" << closestBlockPos.x << ", " << closestBlockPos.y << ", " << closestBlockPos.z << ")\n";
-    return closestBlockPos;
 }

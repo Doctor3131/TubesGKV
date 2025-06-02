@@ -352,21 +352,20 @@ void display() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    // Normalize lookDirection to ensure correct camera target
-    Vector3 lookDirNormalized = player.lookDirection.normalized();
+    // Assuming player position is at the feet, add eye height (e.g., 1.7f)
+    Vector3 eye = player.getPosition();
 
-    // Set camera position: behind and slightly above player
-    Vector3 eye = player.getPosition() + Vector3(-5.0f, 3.0f, -5.0f);
+    // Use the player's look direction directly (should already be normalized)
+    Vector3 center = eye + player.lookDirection;
 
-    // Camera looks towards player look direction
-    Vector3 center = eye + lookDirNormalized;
-
-    // Up vector remains world up
+    // World up vector
     Vector3 up(0.0f, 1.0f, 0.0f);
 
     gluLookAt(eye.x, eye.y, eye.z,
             center.x, center.y, center.z,
             up.x, up.y, up.z);
+
+
     for (size_t z = 0; z < std::min(blockGrid.depth(), size_t(50)); ++z) {
         for (size_t y = 0; y < std::min(blockGrid.rows(), size_t(50)); ++y) {
             for (size_t x = 0; x < std::min(blockGrid.cols(), size_t(50)); ++x) {
@@ -408,12 +407,72 @@ void display() {
     // TAMBAHAN: Set warna global lebih terang
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     
-        // Draw the player
+    
+    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    
     glColor3f(1.0f, 0.0f, 0.0f);
+
+    Vector3 looking = player.getClickedGroundCoordinate(player.lookDirection.x, player.lookDirection.y, windowWidth, windowHeight);
+
+    std::cout << "Block coordinate to draw: (" << looking.x << ", " << looking.y << ", " << looking.z << ")\n";
+    std::cout << "Player looking at block: (" << player.lookDirection.x << ", " << player.lookDirection.y << ", " << player.lookDirection.z << ")\n";
+    std::cout << "Player position: (" << player.getPosition().x << ", " << player.getPosition().y << ", " << player.getPosition().z << ")\n";
+
+    if (looking.x >= 0 && looking.y >= 0 && looking.z >= 0) {
+        glPushMatrix();
+        glTranslatef(looking.x + 0.5f, looking.y + 0.5f, looking.z + 0.5f); // translate to center of block
+        glutSolidCube(1.0f);
+        glPopMatrix();
+    } else {
+        std::cout << "No valid block to draw.\n";
+    }
+
     glPushMatrix();
     glTranslatef(player.getPosition().x, player.getPosition().y, player.getPosition().z);
-    // glutSolidCube(1.0f);
+    glColor3f(0, 1, 0); // Green cube for player
+    glutWireCube(1.0f);
     glPopMatrix();
+
+    // --- Draw Crosshair ---
+    // Switch to orthographic projection for 2D overlay
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, windowWidth, 0, windowHeight);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glLineWidth(2.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+    float cx = windowWidth / 2.0f;
+    float cy = windowHeight / 2.0f;
+    float size = 10.0f;
+
+    glBegin(GL_LINES);
+        // horizontal line
+        glVertex2f(cx - size, cy);
+        glVertex2f(cx + size, cy);
+
+        // vertical line
+        glVertex2f(cx, cy - size);
+        glVertex2f(cx, cy + size);
+    glEnd();
+
+    glEnable(GL_DEPTH_TEST);
+
+    // Restore matrices
+    glPopMatrix();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+
+    glMatrixMode(GL_MODELVIEW);
+
     glutSwapBuffers();
 }
 
