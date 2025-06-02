@@ -7,6 +7,7 @@
 
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <iomanip>
 #include <chrono>
 
@@ -30,6 +31,11 @@ int lastMouseY = -1;
 
 void keyboard(unsigned char key, int x, int y) {
     float moveSpeed = 0.1f;
+    
+    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    
+
     switch (key) {
         case 'w': player.moveForward(moveSpeed); break;
         case 's': player.moveBackward(moveSpeed); break;
@@ -37,7 +43,7 @@ void keyboard(unsigned char key, int x, int y) {
         case 'd': player.moveRight(moveSpeed); break;
         case 'x': player.moveUp(moveSpeed); break; // Jump
         case 'c': player.moveDown(moveSpeed); break;
-        case 'p': player.place(player.getPosition() - Vector3(player.lookDirection * 2.0f)); break;
+        case 'p': player.getClickedGroundCoordinate(player.lookDirection.x, player.lookDirection.y, windowWidth, windowHeight); break;
         case 27: exit(0); break;
         default: break;
     }
@@ -364,13 +370,7 @@ void display() {
                 const Block* rawPtr = block.get();
                 if (block) {
                     // Temp Solution ideally we should do face culling
-                    bool covered = 
-                        blockGrid.at(z, (y + 1) % 100, x) &&  // top
-                        blockGrid.at(z, (y - 1) % 100, x) &&  // bottom
-                        blockGrid.at(z, y, (x + 1) % 100) &&  // right
-                        blockGrid.at(z, y, (x - 1) % 100) &&  // left
-                        blockGrid.at((z + 1) % 100, y, x) &&  // front
-                        blockGrid.at((z - 1) % 100, y, x);    // back
+                    bool covered = false;
 
                     if (!covered) {
                         drawCubeWithTextures(block->getPosition(), block->getSize(), block->getTextures(), rawPtr);
@@ -396,12 +396,35 @@ void display() {
     glutSwapBuffers();
 }
 
+bool justWarped = false;
+int centerX, centerY;
+float yaw = 0.0f, pitch = 0.0f;
+
 void mouseMove(int x, int y) {
-    if (lastMouseX != -1 && lastMouseY != -1) {
-        float deltaX = x - lastMouseX;
-        float deltaY = y - lastMouseY;
-        player.look(deltaX, deltaY);
+    if (justWarped) {
+        justWarped = false;
+        return;
     }
-    lastMouseX = x;
-    lastMouseY = y;
+
+    int xoffset = x - lastMouseX;
+    int yoffset = lastMouseY - y;  // reversed since y-coordinates go downwards
+
+    lastMouseX = centerX;
+    lastMouseY = centerY;
+
+    float sensitivity = 0.1f;  // tweak to control speed
+    float xoffsetf = xoffset * sensitivity;
+    float yoffsetf = yoffset * sensitivity;
+
+    player.look(xoffsetf, yoffsetf);
+
+    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+    centerX = windowWidth / 2;
+    centerY = windowHeight / 2;
+
+    glutWarpPointer(centerX, centerY);
+    justWarped = true;
+    glutPostRedisplay();  // request redraw
+
 }

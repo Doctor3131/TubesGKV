@@ -28,6 +28,7 @@ public:
     void update(float deltaTime); // Apply gravity
     void look(float deltaX, float deltaY); // Handle mouse look
     void setPosition(const Vector3& newPos);
+    Vector3 getClickedGroundCoordinate(int mouseX, int mouseY, int windowWidth, int windowHeight);
 
 private:
     Vector3 position;
