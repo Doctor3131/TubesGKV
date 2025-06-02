@@ -24,6 +24,11 @@ public:
     void moveUp(float speed); // For jumping
     void moveDown(float speed);
 
+    // 
+    void remove(const Vector3& target);
+    Vector3 getBlockInFront(float distance = 5.0f) const;
+
+
     void place(const Vector3& target);
     void update(float deltaTime); // Apply gravity
     void look(float deltaX, float deltaY); // Handle mouse look

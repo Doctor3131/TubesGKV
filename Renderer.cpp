@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <chrono>
 
+
 const float TOP_BRIGHTNESS = 1.0f;      // Top face paling terang (terkena matahari langsung)
 const float FRONT_BRIGHTNESS = 0.8f;    // Front face terang
 const float BACK_BRIGHTNESS = 0.8f;     // Back face terang  
@@ -43,6 +44,9 @@ void keyboard(unsigned char key, int x, int y) {
         case 'd': player.moveRight(moveSpeed); break;
         case 'x': player.moveUp(moveSpeed); break; // Jump
         case 'c': player.moveDown(moveSpeed); break;
+        case 'y': {Vector3 target = player.getClickedGroundCoordinate(player.lookDirection.x, player.lookDirection.y, windowWidth, windowHeight);player.remove(target);break;}
+        case 'z': {Vector3 target = player.getClickedGroundCoordinate(player.lookDirection.x, player.lookDirection.y, windowWidth, windowHeight);player.place(target);break;}
+
         case 'p': player.getClickedGroundCoordinate(player.lookDirection.x, player.lookDirection.y, windowWidth, windowHeight); break;
         case 27: exit(0); break;
         default: break;
