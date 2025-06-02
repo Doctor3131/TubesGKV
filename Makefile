@@ -12,7 +12,7 @@ OBJS = $(SRCS:.cpp=.o)
 HEADERS = Block.h Mat3.h Player.h renderChunks.h Renderer.h Vector3.h \
           textureManager.h loadimage/textureloader.h loadimage/stb_image.h
 
-TARGET = blockgame
+TARGET = Blockcraft
 
 all: $(TARGET)
 
