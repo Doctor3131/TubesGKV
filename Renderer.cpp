@@ -245,22 +245,22 @@ void drawFrontTextureOnly(const Vector3& pos, const Vector3& size, GLuint frontT
 }
 
 // UPDATED: drawCubeWithTextures dengan manual lighting
-void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTextureSet& textures, const Block* block) {
-    // Special case untuk door
+// Update drawCubeWithTextures to accept the drawFace array
+void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTextureSet& textures, const Block* block, const bool drawFace[6]) {
     if (block && block->getType() == BlockType::Door) {
         bool isBottomPart = block->isBottomBlock();
         drawDoor(pos, size, textures, isBottomPart);
         return;
     }
-    
+
     glPushMatrix();
     glTranslatef(pos.x, pos.y, pos.z);
-    
+
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
-    
-    // TOP FACE (paling terang - terkena matahari langsung)
-    if (!block || block->shouldRenderFace(BlockFace::TOP)) {
+
+    // TOP FACE (index 4)
+    if (!block || drawFace[4]) {
         setBrightness(TOP_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::TOP));
         glBegin(GL_QUADS);
@@ -271,9 +271,9 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
             glTexCoord2f(1.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, -size.z / 2);
         glEnd();
     }
-    
-    // FRONT FACE (terang - pemain biasanya lihat dari sini)
-    if (!block || block->shouldRenderFace(BlockFace::FRONT) || true) {
+
+    // FRONT FACE (index 0)
+    if (!block || drawFace[0]) {
         setBrightness(FRONT_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::FRONT));
         glBegin(GL_QUADS);
@@ -284,9 +284,9 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
             glTexCoord2f(0.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, size.z / 2);
         glEnd();
     }
-    
-    // BACK FACE (terang - sama seperti front)
-    if (!block || block->shouldRenderFace(BlockFace::BACK ) || true) {
+
+    // BACK FACE (index 1)
+    if (!block || drawFace[1]) {
         setBrightness(BACK_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::BACK));
         glBegin(GL_QUADS);
@@ -297,9 +297,9 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
             glTexCoord2f(0.0f, 0.0f); glVertex3f(size.x / 2, -size.y / 2, -size.z / 2);
         glEnd();
     }
-    
-    // LEFT FACE (agak gelap - side lighting)
-    if (!block || block->shouldRenderFace(BlockFace::LEFT) || true) {
+
+    // LEFT FACE (index 2)
+    if (!block || drawFace[2]) {
         setBrightness(LEFT_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::LEFT));
         glBegin(GL_QUADS);
@@ -310,9 +310,9 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
             glTexCoord2f(0.0f, 1.0f); glVertex3f(-size.x / 2, size.y / 2, -size.z / 2);
         glEnd();
     }
-    
-    // RIGHT FACE (agak gelap - side lighting)
-    if (!block || block->shouldRenderFace(BlockFace::RIGHT) || true) {
+
+    // RIGHT FACE (index 3)
+    if (!block || drawFace[3]) {
         setBrightness(RIGHT_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::RIGHT));
         glBegin(GL_QUADS);
@@ -323,9 +323,9 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
             glTexCoord2f(1.0f, 1.0f); glVertex3f(size.x / 2, size.y / 2, -size.z / 2);
         glEnd();
     }
-    
-    // BOTTOM FACE (paling gelap - tidak terkena cahaya)
-    if (!block || block->shouldRenderFace(BlockFace::BOTTOM)) {
+
+    // BOTTOM FACE (index 5)
+    if (!block || drawFace[5]) {
         setBrightness(BOTTOM_BRIGHTNESS);
         glBindTexture(GL_TEXTURE_2D, textures.getTexture(BlockFace::BOTTOM));
         glBegin(GL_QUADS);
@@ -336,9 +336,10 @@ void drawCubeWithTextures(const Vector3& pos, const Vector3& size, const BlockTe
             glTexCoord2f(1.0f, 0.0f); glVertex3f(-size.x / 2, -size.y / 2, size.z / 2);
         glEnd();
     }
-    
+
     glPopMatrix();
 }
+
 
 // FIXED: display() function dengan lighting yang lebih baik
 void display() {
@@ -362,19 +363,35 @@ void display() {
     gluLookAt(eye.x, eye.y, eye.z,
             center.x, center.y, center.z,
             up.x, up.y, up.z);
-
     for (size_t z = 0; z < std::min(blockGrid.depth(), size_t(50)); ++z) {
         for (size_t y = 0; y < std::min(blockGrid.rows(), size_t(50)); ++y) {
             for (size_t x = 0; x < std::min(blockGrid.cols(), size_t(50)); ++x) {
                 auto block = blockGrid.at(z, y, x);
-                const Block* rawPtr = block.get();
                 if (block) {
-                    // Temp Solution ideally we should do face culling
-                    bool covered = false;
+                    // Check neighbors
+                    bool drawFace[6] = {true, true, true, true, true, true}; 
+                    // Order: 0=front(+z),1=back(-z),2=left(-x),3=right(+x),4=top(+y),5=bottom(-y)
 
-                    if (!covered) {
-                        drawCubeWithTextures(block->getPosition(), block->getSize(), block->getTextures(), rawPtr);
-                    }
+                    // Front (+z)
+                    if (z + 1 < blockGrid.depth() && blockGrid.at(z + 1, y, x)) drawFace[0] = false;
+
+                    // Back (-z)
+                    if (z > 0 && blockGrid.at(z - 1, y, x)) drawFace[1] = false;
+
+                    // Left (-x)
+                    if (x > 0 && blockGrid.at(z, y, x - 1)) drawFace[2] = false;
+
+                    // Right (+x)
+                    if (x + 1 < blockGrid.cols() && blockGrid.at(z, y, x + 1)) drawFace[3] = false;
+
+                    // Top (+y)
+                    if (y + 1 < blockGrid.rows() && blockGrid.at(z, y + 1, x)) drawFace[4] = false;
+
+                    // Bottom (-y)
+                    if (y > 0 && blockGrid.at(z, y - 1, x)) drawFace[5] = false;
+
+                    // Now pass the drawFace array to your drawing function
+                    drawCubeWithTextures(block->getPosition(), block->getSize(), block->getTextures(), block.get(), drawFace);
                 }
             }
         }
@@ -418,10 +435,10 @@ void mouseMove(int x, int y) {
 
     player.look(xoffsetf, yoffsetf);
 
-    int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
-    int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-    centerX = windowWidth / 2;
-    centerY = windowHeight / 2;
+    int windowWidth1 = glutGet(GLUT_WINDOW_WIDTH);
+    int windowHeight1 = glutGet(GLUT_WINDOW_HEIGHT);
+    centerX = windowWidth1 / 2;
+    centerY = windowHeight1 / 2;
 
     glutWarpPointer(centerX, centerY);
     justWarped = true;

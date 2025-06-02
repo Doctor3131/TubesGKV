@@ -12,8 +12,6 @@
 extern bool justWarped;
 extern int centerX, centerY;
 extern float yaw, pitch;
-extern int windowWidth;
-extern int windowHeight;
 
 void initOpenGL();
 void keyboard(unsigned char key, int x, int y);
