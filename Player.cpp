@@ -99,32 +99,75 @@ void Player::remove(const Vector3& target) {
     }
 }
 
-// Place
-
 void Player::place(const Vector3& target) {
     auto& texManager = TextureManager::getInstance();
-    
-    int x = static_cast<int>(target.x);
-    int y = static_cast<int>(target.y);
-    int z = static_cast<int>(target.z);
 
-    if (x >= 0 && x < static_cast<int>(blockGrid.cols()) &&
-        y >= 0 && y < static_cast<int>(blockGrid.rows()) &&
-        z >= 0 && z < static_cast<int>(blockGrid.depth())) {
+    // Block we are pointing at
+    int hitX = static_cast<int>(std::floor(target.x));
+    int hitY = static_cast<int>(std::floor(target.y));
+    int hitZ = static_cast<int>(std::floor(target.z));
 
-        if (!blockGrid.at(z, y, x)) { // hanya jika kosong
-            BlockType type = BlockType::Grass;  // atau yang kamu mau
-            Vector3 pos(x, y, z);
+    // Face normal from look direction
+    Vector3 normal(0, 0, 0);
+
+    // Determine the most dominant axis in look direction
+    float absX = std::abs(lookDirection.x);
+    float absY = std::abs(lookDirection.y);
+    float absZ = std::abs(lookDirection.z);
+
+    if (absX >= absY && absX >= absZ)
+        normal.x = (lookDirection.x > 0) ? -1 : 1;
+    else if (absY >= absX && absY >= absZ)
+        normal.y = (lookDirection.y > 0) ? -1 : 1;
+    else
+        normal.z = (lookDirection.z > 0) ? -1 : 1;
+
+    // New block position: adjacent to the face we’re looking at
+    int placeX = hitX + static_cast<int>(normal.x);
+    int placeY = hitY + static_cast<int>(normal.y);
+    int placeZ = hitZ + static_cast<int>(normal.z);
+
+    // Debug output to confirm coordinates
+    // std::cout << "Hit block: (" << hitX << ", " << hitY << ", " << hitZ << ")\n";
+    // std::cout << "Look dir: (" << lookDirection.x << ", " << lookDirection.y << ", " << lookDirection.z << ")\n";
+    // std::cout << "Place at: (" << placeX << ", " << placeY << ", " << placeZ << ")\n";
+
+    // Bounds check
+    if (placeX >= 0 && placeX < static_cast<int>(blockGrid.cols()) &&
+        placeY >= 0 && placeY < static_cast<int>(blockGrid.rows()) &&
+        placeZ >= 0 && placeZ < static_cast<int>(blockGrid.depth())) {
+
+        if (!blockGrid.at(placeZ, placeY, placeX)) {
+            BlockType type = hand[handindex];
+            Vector3 pos(placeX, placeY, placeZ);
             Vector3 size(1.0f, 1.0f, 1.0f);
-
-            BlockTextureSet textures = texManager.getBlockTextures(type); // fungsi yang sudah ada
+            BlockTextureSet textures = texManager.getBlockTextures(type);
 
             auto newBlock = std::make_shared<Block>(type, pos, size, textures);
-            blockGrid.at(z, y, x) = newBlock;
+            blockGrid.at(placeZ, placeY, placeX) = newBlock;
+
+            std::cout << "Block placed.\n";
+        } else {
+            std::cout << "Block already exists at target location.\n";
         }
+    } else {
+        std::cout << "Target location out of bounds.\n";
     }
 }
 
+void Player::nextitem(){
+    handindex += 1;
+    handindex = handindex % 11;
+    std::cout << "Current hand" << handindex << std::endl;
+}
+
+void Player::previtem(){
+    handindex -= 1;
+    if (handindex < 0) {
+        handindex = 0;
+    }
+    std::cout << "Current hand" << handindex << std::endl;
+}
 
 Vector3 Player::getBlockInFront(float distance) const {
     Vector3 dir = lookDirection.normalized();
@@ -177,28 +220,79 @@ void Player::look(float deltaX, float deltaY) {
 
 Vector3 Player::getClickedGroundCoordinate(int mouseX, int mouseY, int windowWidth, int windowHeight) {
     Vector3 origin = this->position;
-    Vector3 dir = this->lookDirection;
-    const float stepSize = 0.05f;
+    Vector3 dir = this->lookDirection.normalized();
+
+    int bx = static_cast<int>(std::floor(origin.x));
+    int by = static_cast<int>(std::floor(origin.y));
+    int bz = static_cast<int>(std::floor(origin.z));
+
+    int stepX = (dir.x > 0) ? 1 : -1;
+    int stepY = (dir.y > 0) ? 1 : -1;
+    int stepZ = (dir.z > 0) ? 1 : -1;
+
+    // Distance along ray to next voxel boundary on each axis
+    float nextVoxelBoundaryX = (stepX > 0) ? (bx + 1.0f) : bx * 1.0f;
+    float nextVoxelBoundaryY = (stepY > 0) ? (by + 1.0f) : by * 1.0f;
+    float nextVoxelBoundaryZ = (stepZ > 0) ? (bz + 1.0f) : bz * 1.0f;
+
+    float tMaxX = (dir.x != 0) ? (nextVoxelBoundaryX - origin.x) / dir.x : std::numeric_limits<float>::infinity();
+    float tMaxY = (dir.y != 0) ? (nextVoxelBoundaryY - origin.y) / dir.y : std::numeric_limits<float>::infinity();
+    float tMaxZ = (dir.z != 0) ? (nextVoxelBoundaryZ - origin.z) / dir.z : std::numeric_limits<float>::infinity();
+
+    float tDeltaX = (dir.x != 0) ? 1.0f / std::abs(dir.x) : std::numeric_limits<float>::infinity();
+    float tDeltaY = (dir.y != 0) ? 1.0f / std::abs(dir.y) : std::numeric_limits<float>::infinity();
+    float tDeltaZ = (dir.z != 0) ? 1.0f / std::abs(dir.z) : std::numeric_limits<float>::infinity();
+
     const float maxDist = 5.0f;
+    float traveled = 0.0f;
 
-    for (float t = 0; t < maxDist; t += stepSize) {
-        Vector3 pos = origin + dir * t;
-
-        int bx = static_cast<int>(floor(pos.x));
-        int by = static_cast<int>(floor(pos.y));
-        int bz = static_cast<int>(floor(pos.z));
-
-        // std::cout << "Checking block at: (" << bx << ", " << by << ", " << bz << ")\n";
-
-        if (bx < 0 || by < 0 || bz < 0 || bx >= blockGrid.cols() || by >= blockGrid.rows() || bz >= blockGrid.depth())
-            continue;
-
+    // Check if starting inside a block:
+    if (bx >= 0 && bx < blockGrid.cols() &&
+        by >= 0 && by < blockGrid.rows() &&
+        bz >= 0 && bz < blockGrid.depth()) {
         if (blockGrid.at(bz, by, bx)) {
-            std::cout << "✅ Hit block at: (" << bx << ", " << by << ", " << bz << ")\n";
             return Vector3(bx, by, bz);
         }
     }
-    // std::cout << "❌ No block hit.\n";
-    return Vector3(-1, -1, -1);
 
+    while (traveled <= maxDist) {
+        // Find axis with smallest tMax and step in that direction
+        if (tMaxX < tMaxY) {
+            if (tMaxX < tMaxZ) {
+                bx += stepX;
+                traveled = tMaxX;
+                tMaxX += tDeltaX;
+            } else {
+                bz += stepZ;
+                traveled = tMaxZ;
+                tMaxZ += tDeltaZ;
+            }
+        } else {
+            if (tMaxY < tMaxZ) {
+                by += stepY;
+                traveled = tMaxY;
+                tMaxY += tDeltaY;
+            } else {
+                bz += stepZ;
+                traveled = tMaxZ;
+                tMaxZ += tDeltaZ;
+            }
+        }
+
+        // Check bounds and block presence
+        if (bx >= 0 && bx < blockGrid.cols() &&
+            by >= 0 && by < blockGrid.rows() &&
+            bz >= 0 && bz < blockGrid.depth()) {
+            if (blockGrid.at(bz, by, bx)) {
+                return Vector3(bx, by, bz);
+            }
+        } else {
+            // Outside bounds - no block hit
+            return Vector3(-1, -1, -1);
+        }
+    }
+
+    // No block found within max distance
+    return Vector3(-1, -1, -1);
 }
+

@@ -44,6 +44,8 @@ void keyboard(unsigned char key, int x, int y) {
         case 'd': player.moveRight(moveSpeed); break;
         case 'x': player.moveUp(moveSpeed); break; // Jump
         case 'c': player.moveDown(moveSpeed); break;
+        case '.': player.nextitem(); break;
+        case ',': player.previtem(); break;
         case 'y': {Vector3 target = player.getClickedGroundCoordinate(player.lookDirection.x, player.lookDirection.y, windowWidth, windowHeight);player.remove(target);break;}
         case 'z': {Vector3 target = player.getClickedGroundCoordinate(player.lookDirection.x, player.lookDirection.y, windowWidth, windowHeight);player.place(target);break;}
 
@@ -415,14 +417,14 @@ void display() {
 
     Vector3 looking = player.getClickedGroundCoordinate(player.lookDirection.x, player.lookDirection.y, windowWidth, windowHeight);
 
-    std::cout << "Block coordinate to draw: (" << looking.x << ", " << looking.y << ", " << looking.z << ")\n";
-    std::cout << "Player looking at block: (" << player.lookDirection.x << ", " << player.lookDirection.y << ", " << player.lookDirection.z << ")\n";
-    std::cout << "Player position: (" << player.getPosition().x << ", " << player.getPosition().y << ", " << player.getPosition().z << ")\n";
+    // std::cout << "Block coordinate to draw: (" << looking.x << ", " << looking.y << ", " << looking.z << ")\n";
+    // std::cout << "Player looking at block: (" << player.lookDirection.x << ", " << player.lookDirection.y << ", " << player.lookDirection.z << ")\n";
+    // std::cout << "Player position: (" << player.getPosition().x << ", " << player.getPosition().y << ", " << player.getPosition().z << ")\n";
 
     if (looking.x >= 0 && looking.y >= 0 && looking.z >= 0) {
         glPushMatrix();
-        glTranslatef(looking.x + 0.5f, looking.y + 0.5f, looking.z + 0.5f); // translate to center of block
-        glutSolidCube(1.0f);
+        glTranslatef(looking.x, looking.y, looking.z); // translate to center of block
+        glutSolidCube(1.01f);
         glPopMatrix();
     } else {
         std::cout << "No valid block to draw.\n";
